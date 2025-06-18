@@ -1,61 +1,27 @@
+<template>
+  <div class="max-w-md mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4">ログイン</h1>
+    <LoginForm @login="handleLogin" />
+    <p class="mt-4 text-gray-500 text-sm">
+      テスト用ログイン：test@example.com / password
+    </p>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
-import { useCartStore } from '~/stores/cart'
+import LoginForm from '~/components/LoginForm.vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '~/stores/user'
 
-const user = useUserStore()
-const cart = useCartStore()
 const router = useRouter()
+const user = useUserStore()
 
-const email = ref('')
-const password = ref('')
-const error = ref('')
-
-const doLogin = () => {
-  if (email.value === 'user@test.co.jp' && password.value === 'pass') {
-    user.login()
-    cart.loadCart()
+const handleLogin = ({ email, password }: { email: string; password: string }) => {
+  if (email === 'test@example.com' && password === 'password') {
+    user.login(email)
     router.push('/')
   } else {
-    error.value = 'メールアドレスまたはパスワードが違います'
+    alert('メールアドレスまたはパスワードが違います')
   }
 }
 </script>
-
-<template>
-  <form @submit.prevent="doLogin" class="p-4 max-w-md mx-auto">
-      <div class="bg-gray-100 border rounded p-3 text-sm text-gray-700">
-      <p class="font-semibold mb-1">テスト用ログイン情報</p>
-      <ul class="list-disc pl-5">
-        <li>メールアドレス: <code>user@test.co.jp</code></li>
-        <li>パスワード: <code>pass</code></li>
-      </ul>
-    </div>
-
-    <div>
-      <label class="block font-semibold mb-1">メールアドレス</label>
-      <input
-        v-model="email"
-        type="email"
-        required
-        class="w-full border px-3 py-2 rounded"
-      />
-    </div>
-
-    <div>
-      <label class="block font-semibold mb-1">パスワード</label>
-      <input
-        v-model="password"
-        type="password"
-        required
-        class="w-full border px-3 py-2 rounded"
-      />
-    </div>
-    <button
-      type="submit"
-      class="w-full bg-blue-500 text-white py-2 rounded"
-    >
-      ログイン
-    </button>
-  </form>
-</template>

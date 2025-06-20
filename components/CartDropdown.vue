@@ -2,6 +2,7 @@
 import { useCartStore } from '~/stores/cart'
 import { useUserStore } from '~/stores/user'
 import { useRouter } from 'vue-router'
+import LogoutButton from '~/components/LogoutButton.vue'
 
 const cart = useCartStore()
 const user = useUserStore()
@@ -10,6 +11,12 @@ const router = useRouter()
 const goToLogin = () => router.push('/login')
 const goToCheckout = () => router.push('/checkout')
 const clearCart = () => cart.clearCart()
+
+const onLogout = () => {
+  user.logout()
+  cart.clearCart()
+  alert('ログアウトしました')
+}
 </script>
 
 <template>
@@ -35,6 +42,9 @@ const clearCart = () => cart.clearCart()
       <button @click="goToCheckout" :disabled="cart.items.length === 0" class="w-full py-2 rounded text-white  bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed">
         決済に進む
       </button>
+      <div>
+        <LogoutButton @logout="onLogout" />
+      </div>
     </div>
 
     <div v-else>

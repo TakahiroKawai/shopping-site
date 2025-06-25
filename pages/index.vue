@@ -6,20 +6,7 @@ import BannerSlider from '~/components/BannerSlider.vue'
 import CouponForm from '~/components/CouponForm.vue'
 import ProductCard from '~/components/ProductCard.vue'
 
-const products = [
-  {
-    name: 'Tシャツ',
-    description: 'シンプルで着心地のよいTシャツ。',
-    price: 2500,
-    image: '/images/tshirt.png' // 生成済み画像のパス
-  },
-  {
-    name: 'キャップ',
-    description: 'カジュアルに使える定番キャップ。',
-    price: 1800,
-    image: '/images/cap.png'
-  }
-]
+const { data: products, pending, error } = await useFetch('/api/products')
 
 const handleAddToCart = (product: typeof products[0]) => {
   cart.addToCart(product)
@@ -45,15 +32,9 @@ const user = useUserStore()
     <section class="my-8">
       <h2 class="text-xl font-bold mb-4">商品一覧</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ProductCard
-          v-for="(product, index) in products"
-          :key="index"
-          v-bind="product"
-          @add-to-cart="handleAddToCart"
-        />
+        <ProductCard v-for="product in products" v-bind="product" @add-to-cart="handleAddToCart"/>
       </div>
     </section>
     <CouponForm />
   </div>
 </template>
-

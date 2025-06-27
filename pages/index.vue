@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import { useCartStore } from '~/stores/cart'
 import { useUserStore } from '~/stores/user'
 import CartDropdown from '~/components/CartDropdown.vue'
@@ -6,7 +7,11 @@ import BannerSlider from '~/components/BannerSlider.vue'
 import CouponForm from '~/components/CouponForm.vue'
 import ProductCard from '~/components/ProductCard.vue'
 
-const { data: products, pending, error } = await useFetch('/api/products')
+const products = ref([])
+
+onMounted(async () => {
+  products.value = await $fetch('/api/products')
+})
 
 const handleAddToCart = (product: typeof products[0]) => {
   cart.addToCart(product)
@@ -14,6 +19,19 @@ const handleAddToCart = (product: typeof products[0]) => {
 
 const cart = useCartStore()
 const user = useUserStore()
+
+const keyword = ref('')
+
+const searchProducts = async () => {
+  products.value = await $fetch('/api/search', {
+    params: { q: keyword.value }
+  })
+}
+
+const clearSearch = async () => {
+  keyword.value = ''
+  products.value = await $fetch('/api/products')
+}
 </script>
 
 <template>
@@ -27,6 +45,16 @@ const user = useUserStore()
 
     <div class="p-4 space-y-6">
       <BannerSlider />
+    </div>
+
+    <div class="flex gap-2 mb-4">
+      <input v-model="keyword" type="text" placeholder="商品名を入力" class="border rounded p-2 flex-1"/>
+      <button @click="clearSearch" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">
+        クリア
+      </button>
+      <button @click="searchProducts" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        検索
+      </button>
     </div>
 
     <section class="my-8">

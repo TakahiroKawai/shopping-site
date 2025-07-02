@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useCartStore } from '~/stores/cart'
 import { useUserStore } from '~/stores/user'
 import CartDropdown from '~/components/CartDropdown.vue'
@@ -8,19 +10,55 @@ import CouponForm from '~/components/CouponForm.vue'
 import ProductCard from '~/components/ProductCard.vue'
 
 const products = ref([])
+const totalPages = ref(1)
 
-onMounted(async () => {
-  products.value = await $fetch('/api/products')
-})
+const cart = useCartStore()
+const user = useUserStore()
+
+const router = useRouter()
+const route = useRoute()
+
+const currentPage = ref(Number(route.query.page) || 1)
+
+const category = ref(route.query.category || '')
+const price = ref(route.query.price || '')
+
+const keyword = ref('')
+
+const fetchProducts = async () => {
+  const res = await $fetch('/api/products', {
+    query: {
+      page: currentPage.value,
+      category: category.value,
+      price: price.value,
+    }
+  })
+  products.value = res.items
+  totalPages.value = res.totalPages
+}
+
+watch(() => route.query, () => {
+  fetchProducts()
+}, { immediate: true, deep: true })
+
+const goToPage = (p: number) => {
+  router.push({ path: '/', query: { page: p } })
+}
 
 const handleAddToCart = (product: typeof products[0]) => {
   cart.addToCart(product)
 }
 
-const cart = useCartStore()
-const user = useUserStore()
-
-const keyword = ref('')
+const applyFilters = () => {
+  router.push({
+    query: {
+      ...route.query,
+      category: category.value || undefined,
+      price: price.value || undefined,
+      page: 1,
+    },
+  })
+}
 
 const searchProducts = async () => {
   products.value = await $fetch('/api/search', {
@@ -57,12 +95,34 @@ const clearSearch = async () => {
       </button>
     </div>
 
+    <div class="mb-4 flex flex-wrap gap-4 items-center">
+      <select v-model="category" class="border px-2 py-1" @change="applyFilters">
+        <option value="">すべてのカテゴリー</option>
+        <option value="Tops">トップス</option>
+        <option value="Cap">キャップ</option>
+        <option value="Bottoms">ボトムス</option>
+        <option value="Shoes">シューズ</option>
+      </select>
+
+      <select v-model="price" class="border px-2 py-1" @change="applyFilters">
+        <option value="">すべての価格</option>
+        <option value="low">〜3000円</option>
+        <option value="mid">3000〜10000円</option>
+        <option value="high">10000円以上</option>
+      </select>
+    </div>
+
     <section class="my-8">
       <h2 class="text-xl font-bold mb-4">商品一覧</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ProductCard v-for="product in products" v-bind="product" @add-to-cart="handleAddToCart"/>
       </div>
     </section>
+    <div class="flex justify-center mt-6 gap-2">
+      <button v-for="p in totalPages" :key="p" @click="goToPage(p)" :class="['px-3 py-1 border rounded', { 'bg-blue-500 text-white': p === currentPage }]">
+        {{ p }}
+      </button>
+    </div>
     <CouponForm />
   </div>
 </template>

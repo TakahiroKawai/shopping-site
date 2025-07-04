@@ -1,0 +1,10 @@
+{
+  "site": "Shopping Site",
+  "title": "Product List",
+  "filter": {
+    "all": "All Categories",
+    "tops": "Tops",
+    "bottoms": "Bottoms"
+  },
+  "language": "Language"
+}

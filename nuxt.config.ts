@@ -9,5 +9,25 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/i18n'],
+  i18n: {
+    locales: [
+      {
+        code: 'ja',
+        iso: 'ja-JP',
+        name: '日本語',
+        file: 'ja.json'
+      },
+      {
+        code: 'en',
+        iso: 'en-US',
+        name: 'English',
+        file: 'en.json'
+      }
+    ],
+    defaultLocale: 'ja',
+    strategy: 'prefix',
+    lazy: true,
+    langDir: '../locales'
+  }
 })

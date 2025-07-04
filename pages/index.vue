@@ -8,6 +8,10 @@ import CartDropdown from '~/components/CartDropdown.vue'
 import BannerSlider from '~/components/BannerSlider.vue'
 import CouponForm from '~/components/CouponForm.vue'
 import ProductCard from '~/components/ProductCard.vue'
+import { useI18n } from '#imports'
+
+const { locale, locales, t } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
 
 const products = ref([])
 const totalPages = ref(1)
@@ -74,13 +78,19 @@ const clearSearch = async () => {
 
 <template>
   <header class="flex justify-between items-center p-4">
-    <h1 class="text-xl font-bold">ショッピングサイト</h1>
+    <h1 class="text-xl font-bold">{{ $t('site') }}</h1>
     <CartToggle />
   </header>
 
-  <div class="p-4">
-    <h1 class="text-2xl font-bold mb-6">ショッピングサイト</h1>
+  <div class="mb-4">
+    <select id="language-select" :value="locale" @change="(e) => navigateTo(switchLocalePath(e.target.value))">
+      <option v-for="loc in locales" :key="loc.code" :value="loc.code">
+        {{ loc.name }}
+      </option>
+    </select>
+  </div>
 
+  <div class="p-4">
     <div class="p-4 space-y-6">
       <BannerSlider />
     </div>
@@ -113,7 +123,7 @@ const clearSearch = async () => {
     </div>
 
     <section class="my-8">
-      <h2 class="text-xl font-bold mb-4">商品一覧</h2>
+      <h2 class="text-xl font-bold mb-4">{{ $t('title') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ProductCard v-for="product in products" v-bind="product" @add-to-cart="handleAddToCart"/>
       </div>
